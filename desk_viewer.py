@@ -15,7 +15,7 @@ except Exception:  # Module might be missing; handled later
 
 
 DATA_PATH = Path(__file__).parent / "data" / "items.json"
-API_KEY_PATH = Path(__file__).parent / "apu_key.txt"
+API_KEY_PATH = Path(__file__).parent / "api_key.txt"
 CANVAS_WIDTH = 900
 CANVAS_HEIGHT = 550
 DOT_RADIUS = 10
@@ -134,14 +134,16 @@ class DeskApp(tk.Tk):
         self.canvas.grid(row=0, column=0, sticky="nsew")
         self.canvas.bind("<Button-1>", self._handle_canvas_click)
 
-        self.status_var = tk.StringVar(value="Click canvas to fill coordinates, or type them.")
+        self.status_var = tk.StringVar(
+            value="Click canvas to fill coordinates, or type them.")
         status = tk.Label(
             canvas_frame, textvariable=self.status_var, fg="#bbbbbb", bg="black"
         )
         status.grid(row=1, column=0, sticky="we", pady=(6, 0))
 
     def _build_controls(self, frame: tk.Frame) -> None:
-        label_cfg = {"fg": "#f0f0f0", "bg": "black", "anchor": "w", "font": self.ui_font}
+        label_cfg = {"fg": "#f0f0f0", "bg": "black",
+                     "anchor": "w", "font": self.ui_font}
         entry_cfg = {
             "bg": "#161616",
             "fg": "#f5f5f5",
@@ -168,33 +170,44 @@ class DeskApp(tk.Tk):
         tk.Entry(frame, textvariable=self.path_var, **entry_cfg).pack(
             fill="x", pady=(0, 8)
         )
-        tk.Button(frame, text="Choose file", command=self._choose_file, **button_style).pack(fill="x", pady=(0, 10))
+        tk.Button(frame, text="Choose file", command=self._choose_file,
+                  **button_style).pack(fill="x", pady=(0, 10))
 
         tk.Label(frame, text="Placed time (ISO)", **label_cfg).pack(fill="x")
-        self.time_var = tk.StringVar(value=datetime.now().isoformat(timespec="seconds"))
-        tk.Entry(frame, textvariable=self.time_var, **entry_cfg).pack(fill="x", pady=(0, 6))
+        self.time_var = tk.StringVar(
+            value=datetime.now().isoformat(timespec="seconds"))
+        tk.Entry(frame, textvariable=self.time_var, **
+                 entry_cfg).pack(fill="x", pady=(0, 6))
 
         tk.Label(frame, text="Item name", **label_cfg).pack(fill="x")
         self.name_var = tk.StringVar()
-        tk.Entry(frame, textvariable=self.name_var, **entry_cfg).pack(fill="x", pady=(0, 6))
+        tk.Entry(frame, textvariable=self.name_var, **
+                 entry_cfg).pack(fill="x", pady=(0, 6))
 
         tk.Label(frame, text="X (0-1)", **label_cfg).pack(fill="x")
         self.x_var = tk.StringVar()
-        tk.Entry(frame, textvariable=self.x_var, **entry_cfg).pack(fill="x", pady=(0, 6))
+        tk.Entry(frame, textvariable=self.x_var, **
+                 entry_cfg).pack(fill="x", pady=(0, 6))
 
         tk.Label(frame, text="Y (0-1)", **label_cfg).pack(fill="x")
         self.y_var = tk.StringVar()
-        tk.Entry(frame, textvariable=self.y_var, **entry_cfg).pack(fill="x", pady=(0, 6))
+        tk.Entry(frame, textvariable=self.y_var, **
+                 entry_cfg).pack(fill="x", pady=(0, 6))
 
         tk.Label(frame, text="Color", **label_cfg).pack(fill="x")
         self.color_var = tk.StringVar()
-        tk.Entry(frame, textvariable=self.color_var, **entry_cfg).pack(fill="x", pady=(0, 10))
+        tk.Entry(frame, textvariable=self.color_var, **
+                 entry_cfg).pack(fill="x", pady=(0, 10))
 
-        tk.Button(frame, text="Add item", command=self._add_item, **button_style).pack(**button_cfg)
-        tk.Button(frame, text="Save", command=self._save_items, **button_style).pack(**button_cfg)
-        tk.Button(frame, text="Reload now", command=lambda: self._load_from_path(), **button_style).pack(**button_cfg)
+        tk.Button(frame, text="Add item", command=self._add_item,
+                  **button_style).pack(**button_cfg)
+        tk.Button(frame, text="Save", command=self._save_items,
+                  **button_style).pack(**button_cfg)
+        tk.Button(frame, text="Reload now", command=lambda: self._load_from_path(
+        ), **button_style).pack(**button_cfg)
 
-        tk.Label(frame, text="Ask the assistant", **label_cfg).pack(fill="x", pady=(12, 0))
+        tk.Label(frame, text="Ask the assistant", **
+                 label_cfg).pack(fill="x", pady=(12, 0))
         self.user_question = tk.Text(
             frame,
             height=4,
@@ -210,7 +223,8 @@ class DeskApp(tk.Tk):
 
         send_frame = tk.Frame(frame, bg="black")
         send_frame.pack(fill="x", pady=(0, 10))
-        tk.Button(send_frame, text="Send", command=self._send_question, **button_style).pack(fill="x")
+        tk.Button(send_frame, text="Send", command=self._send_question,
+                  **button_style).pack(fill="x")
 
         tk.Label(frame, text="Chat", **label_cfg).pack(fill="x", pady=(8, 0))
         self.response_box = tk.Text(
@@ -223,7 +237,8 @@ class DeskApp(tk.Tk):
             font=self.ui_font,
         )
         self.response_box.pack(fill="both", expand=True)
-        self.response_box.insert("1.0", "Assistant is ready. Ask about the desk items.\n\n")
+        self.response_box.insert(
+            "1.0", "Assistant is ready. Ask about the desk items.\n\n")
         self.response_box.config(state="disabled")
 
     def _load_initial_items(self) -> None:
@@ -261,14 +276,16 @@ class DeskApp(tk.Tk):
                 color=self.color_var.get().strip(),
             )
         except ValueError:
-            messagebox.showerror("Format error", "X and Y must be numbers (0-1).")
+            messagebox.showerror(
+                "Format error", "X and Y must be numbers (0-1).")
             return
 
         if not item.name:
             messagebox.showerror("Missing name", "Please enter item name.")
             return
         if not (0 <= item.x <= 1 and 0 <= item.y <= 1):
-            messagebox.showerror("Coordinate error", "X/Y must be between 0 and 1.")
+            messagebox.showerror("Coordinate error",
+                                 "X/Y must be between 0 and 1.")
             return
 
         self.items.append(item)
@@ -300,7 +317,8 @@ class DeskApp(tk.Tk):
                 data = json.load(f)
         except Exception as exc:  # json errors
             if show_errors:
-                messagebox.showerror("Load failed", f"Cannot parse file: {exc}")
+                messagebox.showerror(
+                    "Load failed", f"Cannot parse file: {exc}")
             return
 
         self.items = [DeskItem.from_dict(d) for d in data]

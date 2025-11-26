@@ -5,6 +5,7 @@ __pycache__/
 
 # User secrets
 apu_key.txt
+api_key.txt
 
 # OS
 .DS_Store
