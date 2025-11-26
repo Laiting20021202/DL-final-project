@@ -20,6 +20,9 @@ python desk_viewer.py
 ```
 Click the canvas to fill normalized coordinates, add items, or edit `data/items.json` directly—changes appear automatically.
 
+## UI preview
+![Desk viewer UI](sample_ui.png)
+
 ## Data format (`items.json`)
 ```json
 [
